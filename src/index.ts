@@ -2,6 +2,7 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import 'dotenv/config';
 import { checkDatabaseConnection } from './db-connection';
+import { uesrRouter } from './controllers/user';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -13,6 +14,8 @@ app.get('/health-check', (req, res) => {
   res.send('Simple IAM Health Check');
 });
 
+app.use('/users', uesrRouter);
+
 process.on('SIGTERM', async () => {
   process.exit(0);
 });
@@ -22,6 +25,6 @@ process.on('SIGINT', async () => {
 });
 
 app.listen(PORT, async () => {
-await checkDatabaseConnection();
+  await checkDatabaseConnection();
   console.log(`Simple IAM running on port ${PORT}`);
 });
