@@ -1,5 +1,5 @@
 export interface UserRoleMapping {
   id: number;
-  roleId: number;
-  userId: number;
+  role_id: number;
+  user_id: number;
 }

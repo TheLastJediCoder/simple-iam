@@ -1,12 +1,4 @@
-enum type {
-  read,
-  create,
-  update,
-  delete,
-}
-
-export interface Scope {
+export interface Role {
   id: number;
   name: string;
-  type: type;
 }

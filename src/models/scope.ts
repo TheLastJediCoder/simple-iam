@@ -1,5 +1,13 @@
-export interface User {
+enum type {
+  get,
+  list,
+  create,
+  update,
+  delete,
+}
+
+export interface Scope {
   id: number;
-  email: string;
-  passwordHash: string;
+  name: string;
+  type: type;
 }
