@@ -3,6 +3,7 @@ import express from 'express';
 import 'dotenv/config';
 import { checkDatabaseConnection } from './db-connection';
 import { uesrRouter } from './controllers/user';
+import { authRouter } from './controllers/auth';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -13,6 +14,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/health-check', (req, res) => {
   res.send('Simple IAM Health Check');
 });
+
+app.use('/auth', authRouter);
 
 app.use('/users', uesrRouter);
 
