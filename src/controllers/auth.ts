@@ -1,9 +1,13 @@
 import express, { Request, Response } from 'express';
-import { LoginRequest, LoginResponse } from '../dtos/auth';
+import { LoginRequest, LoginResponse, LogoutRequest } from '../dtos/auth';
 import { getUserByEmail } from '../repositories/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { createAccessToken } from '../repositories/access-token';
+import {
+  createAccessToken,
+  deleteAccessToken,
+  getAccessTokenByAccessToken,
+} from '../repositories/access-token';
 
 export const authRouter = express.Router();
 
@@ -56,4 +60,38 @@ const login = async (req: Request, res: Response) => {
   res.send(response);
 };
 
+const logout = async (req: Request, res: Response) => {
+  if (!req.body.accessToken) {
+    res.status(401);
+    res.send({ error: 'Access token is missing in request!' });
+    return;
+  }
+
+  const logoutRequest: LogoutRequest = req.body;
+
+  try {
+    jwt.verify(logoutRequest.accessToken, JWT_SECRET);
+  } catch {
+    res.status(401);
+    res.send({ error: 'Invalid Access token in request!' });
+    return;
+  }
+
+  const accessToken = await getAccessTokenByAccessToken(
+    logoutRequest.accessToken,
+  );
+
+  if (!accessToken) {
+    res.status(404);
+    res.send({ error: 'Access token not found!' });
+    return;
+  }
+
+  await deleteAccessToken(accessToken);
+
+  res.status(200);
+  res.send({ success: 'Logout successfully' });
+};
+
 authRouter.post('/login', login);
+authRouter.post('/logout', logout);
