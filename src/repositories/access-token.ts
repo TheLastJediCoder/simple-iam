@@ -19,7 +19,7 @@ export const createAccessToken = async (
 export const getAccessTokenByAccessToken = async (
   accessToken: string,
 ): Promise<AccessToken | undefined> => {
-  const query = 'SELECT * FROM access_tokens WHERE access_token=?;';
+  const query = 'SELECT * FROM access_tokens WHERE access_token = ?;';
   const params = [accessToken];
   const results = await executeQuery<AccessToken[]>(query, params);
 
@@ -29,7 +29,7 @@ export const getAccessTokenByAccessToken = async (
 };
 
 export const deleteAccessToken = async (accessToken: AccessToken) => {
-  const query = 'DELETE FROM access_tokens where id=?;';
+  const query = 'DELETE FROM access_tokens where id = ?;';
   const params = [accessToken.id];
   const result = await executeQuery<ResultSetHeader>(query, params);
 
