@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { createUser, getUserByEmail } from '../repositories/user';
 import { CreateUserRequest, CreateUserResponse } from '../dtos/user';
 
-export const uesrRouter = express.Router();
+export const userRouter = express.Router();
 
 const addUser = async (req: Request, res: Response) => {
   const createUserRequest = req.body as CreateUserRequest;
@@ -27,4 +27,4 @@ const addUser = async (req: Request, res: Response) => {
   res.status(201);
 };
 
-uesrRouter.post('/', addUser);
+userRouter.post('/', addUser);

@@ -2,7 +2,7 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import 'dotenv/config';
 import { checkDatabaseConnection } from './db-connection';
-import { uesrRouter } from './controllers/user';
+import { userRouter } from './controllers/user';
 import { authRouter } from './controllers/auth';
 
 const app = express();
@@ -17,7 +17,7 @@ app.get('/health-check', (req, res) => {
 
 app.use('/auth', authRouter);
 
-app.use('/users', uesrRouter);
+app.use('/users', userRouter);
 
 process.on('SIGTERM', async () => {
   process.exit(0);
