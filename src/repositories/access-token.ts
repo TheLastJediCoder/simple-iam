@@ -1,6 +1,7 @@
 import { ResultSetHeader } from 'mysql2';
 import { executeQuery } from '../db-connection';
 import { User } from '../models/user';
+import { AccessToken } from '../models/access-token';
 
 export const createAccessToken = async (
   accessToken: string,
@@ -13,4 +14,16 @@ export const createAccessToken = async (
   const result = await executeQuery<ResultSetHeader>(query, params);
 
   return result.insertId;
+};
+
+export const getAccessTokenByAccessToken = async (
+  accessToken: string,
+): Promise<AccessToken | undefined> => {
+  const query = 'SELECT * FROM access_tokens WHERE access_token=?;';
+  const params = [accessToken];
+  const results = await executeQuery<AccessToken[]>(query, params);
+
+  if (results.length > 0) {
+    return results[0];
+  }
 };
