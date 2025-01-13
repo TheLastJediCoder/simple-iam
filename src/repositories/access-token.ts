@@ -27,3 +27,13 @@ export const getAccessTokenByAccessToken = async (
     return results[0];
   }
 };
+
+export const deleteAccessToken = async (accessToken: AccessToken) => {
+  const query = 'DELETE FROM access_tokens where id=?;';
+  const params = [accessToken.id];
+  const result = await executeQuery<ResultSetHeader>(query, params);
+
+  if (result.affectedRows === 1) {
+    return result;
+  }
+};
