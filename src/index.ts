@@ -4,6 +4,7 @@ import 'dotenv/config';
 import { checkDatabaseConnection } from './db-connection';
 import { userRouter } from './controllers/user';
 import { authRouter } from './controllers/auth';
+import { scopeRouter } from './controllers/scope';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -16,8 +17,8 @@ app.get('/health-check', (req, res) => {
 });
 
 app.use('/auth', authRouter);
-
 app.use('/users', userRouter);
+app.use('/scopes', scopeRouter);
 
 process.on('SIGTERM', async () => {
   process.exit(0);
