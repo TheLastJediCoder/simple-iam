@@ -3,7 +3,7 @@ import { LoginRequest, LoginResponse } from '../dtos/auth';
 import { getUserByEmail } from '../repositories/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { createToken } from '../repositories/access-token';
+import { createAccessToken } from '../repositories/access-token';
 
 export const authRouter = express.Router();
 
@@ -18,7 +18,7 @@ const login = async (req: Request, res: Response) => {
 
   if (!req.body.password) {
     res.status(404);
-    res.send({ error: 'Passwird is required for login' });
+    res.send({ error: 'Password is required for login' });
     return;
   }
 
@@ -46,7 +46,7 @@ const login = async (req: Request, res: Response) => {
     expiresIn: '5m',
   });
 
-  await createToken(accessToken, user);
+  await createAccessToken(accessToken, user);
 
   const response: LoginResponse = {
     accessToken: accessToken,
