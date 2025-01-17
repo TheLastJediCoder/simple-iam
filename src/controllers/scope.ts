@@ -66,11 +66,14 @@ const updateScope = async (req: Request, res: Response) => {
     return;
   }
 
-	if (req.body.type && (!(req.body.type in ScopeType) || !isNaN(req.body.type ))) {
-		res.status(401);
-		res.send ({error: `Scope Type: ${req.body.type} is not allowed`})
-		return;
-	}
+  if (
+    req.body.type &&
+    (!(req.body.type in ScopeType) || !isNaN(req.body.type))
+  ) {
+    res.status(401);
+    res.send({ error: `Scope Type: ${req.body.type} is not allowed` });
+    return;
+  }
 
   const updateScopeRequest: UpdateScopeRequest = req.body;
 
@@ -79,11 +82,11 @@ const updateScope = async (req: Request, res: Response) => {
 
   const result = await updateScopeR(scope);
 
-	if (!result) {
-		res.status(500);
+  if (!result) {
+    res.status(500);
     res.send({ error: `Unable to update scope for scopeId: ${scopeId}` });
     return;
-	}
+  }
 
   res.status(200);
   res.send(scope);

@@ -13,7 +13,9 @@ export const addScope = async (
   return results.insertId;
 };
 
-export const getScopeById = async (scopeId: number): Promise<Scope | undefined> => {
+export const getScopeById = async (
+  scopeId: number,
+): Promise<Scope | undefined> => {
   const query = 'SELECT * FROM scopes WHERE id = ?;';
   const params = [scopeId];
   const results = await executeQuery<Scope[]>(query, params);
@@ -24,23 +26,23 @@ export const getScopeById = async (scopeId: number): Promise<Scope | undefined> 
 };
 
 export const updateScopeR = async (scope: Scope) => {
-	const query = 'UPDATE scopes SET name = ?, type = ? WHERE id = ?;';
-	const params = [scope.name, scope.type, scope.id]
-	const result = await executeQuery<ResultSetHeader>(query, params);
+  const query = 'UPDATE scopes SET name = ?, type = ? WHERE id = ?;';
+  const params = [scope.name, scope.type, scope.id];
+  const result = await executeQuery<ResultSetHeader>(query, params);
 
-	console.log(result);
+  console.log(result);
 
-	if (result.affectedRows === 1) {
-		return result;
-	}
-}
+  if (result.affectedRows === 1) {
+    return result;
+  }
+};
 
 export const deleteScopeR = async (scope: Scope) => {
-	const query = 'DELETE FROM scopes WHERE id = ?;';
-	const params = [scope.id]
-	const result = await executeQuery<ResultSetHeader>(query, params);
+  const query = 'DELETE FROM scopes WHERE id = ?;';
+  const params = [scope.id];
+  const result = await executeQuery<ResultSetHeader>(query, params);
 
-	if (result.affectedRows === 1) {
-		return result;
-	}
-}
+  if (result.affectedRows === 1) {
+    return result;
+  }
+};
