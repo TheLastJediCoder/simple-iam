@@ -1,10 +1,10 @@
 import bodyParser from 'body-parser';
 import express from 'express';
 import 'dotenv/config';
-import { checkDatabaseConnection } from './db-connection';
 import { userRouter } from './controllers/user';
 import { authRouter } from './controllers/auth';
 import { scopeRouter } from './controllers/scope';
+import { sequelize } from './config/database';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -29,6 +29,8 @@ process.on('SIGINT', async () => {
 });
 
 app.listen(PORT, async () => {
-  await checkDatabaseConnection();
+  await sequelize.authenticate();
+  console.log('Connection has been established successfully.');
+  sequelize.close()
   console.log(`Simple IAM running on port ${PORT}`);
 });
