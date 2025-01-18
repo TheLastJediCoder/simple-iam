@@ -29,14 +29,44 @@ A simple identity and access management
 
    ```text
    PORT=3020
-   DATABASE_HOST=localhost
-   DATABASE_PORT=3306
-   DATABASE_USER=root
-   DATABASE_PASSWORD=password
-   DATABASE_NAME=simple_iam
+   DATABASE_URL="mysql://root:password@localhost:3306/simple_iam"
    ```
 
-5. **Run the project**:
+5. **Prisma Usage**:
+   - Create a migration:
+
+     ```bash
+     npx prisma migrate dev --name <name_of_migration>
+     ```
+
+   - Apply migrations:
+
+     ```bash
+     npx prisma migrate deploy
+     ```
+
+   - Generate the Prisma Client:
+
+     ```bash
+     npx prisma generate
+     ```
+
+6. **Prerequisites**:
+
+   - The database is set up and migrated using Prisma:
+      1. Configure the database connection in the .env file (see Set Up Environment Variables).
+      2. Run the following command to apply the already created migrations:
+
+         ```bash
+         npx prisma migrate deploy
+         ```
+  
+         This will apply the existing database schema.
+
+      3. The database is running and accessible.
+      4. All required environment variables are configured in the .env file.
+
+7. **Run the project**:
    - Development mode:
 
      ```bash

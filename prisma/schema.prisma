@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          String      @id @default(uuid())
+  name        String      @db.VarChar(500)
+  rolesScopes RoleScope[]
+  usersRoles  UserRole[]
+
+  @@map("roles")
+}
+
+model RoleScope {
+  id      String @id @default(uuid())
+  scopeId String @default(uuid()) @map("scope_id")
+  roleId  String @default(uuid()) @map("role_id")
+  roles   Role   @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "role_scopes_role_id_fk")
+  scopes  Scope  @relation(fields: [scopeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "role_scopes_scope_id_fk")
+
+  @@index([roleId], map: "simple_iam_simple_iam_idx_role_scopes_role_id")
+  @@index([scopeId], map: "simple_iam_simple_iam_idx_role_scopes_scope_id")
+  @@map("roles_scopes")
+}
+
+model Scope {
+  id          String      @id @default(uuid())
+  name        String      @db.VarChar(500)
+  type        ScopesType
+  rolesScopes RoleScope[]
+
+  @@map("scopes")
+}
+
+model UserToken {
+  id                    String    @id @default(uuid())
+  accessToken           String    @map("access_token") @db.VarChar(500)
+  accessTokenExpiresAt  DateTime  @map("access_token_expires_at") @db.DateTime(0)
+  userId                String    @default(uuid()) @map("user_id")
+  refreshToken          String    @map("refresh_token") @db.VarChar(500)
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at") @db.DateTime(0)
+  isRevoked             Boolean?  @map("is_revoked")
+  users                 User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "access_tokens_user_id_fk")
+
+  @@index([userId], map: "access_tokens_user_id_fk")
+  @@map("user_tokens")
+}
+
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique(map: "email") @db.VarChar(500)
+  passwordHash String      @map("password_hash") @db.VarChar(500)
+  userTokens   UserToken[]
+  usersRoles   UserRole[]
+
+  @@map("users")
+}
+
+model UserRole {
+  id     String @id @default(uuid())
+  roleId String @default(uuid()) @map("role_id")
+  userId String @default(uuid()) @map("user_id")
+  roles  Role   @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_roles_role_id_fk")
+  users  User   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_roles_user_id_fk")
+
+  @@index([roleId], map: "simple_iam_simple_iam_idx_user_roles_role_id")
+  @@index([userId], map: "simple_iam_simple_iam_idx_user_roles_user_id")
+  @@map("users_roles")
+}
+
+enum ScopesType {
+  get
+  list
+  create
+  update
+  delete
+
+  @@map("scopes_type")
+}
