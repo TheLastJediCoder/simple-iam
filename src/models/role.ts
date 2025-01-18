@@ -1,7 +1,9 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/database';
+import { Scope } from './scope';
+import { RoleScopes } from './role-scopes';
 
-export const Role = sequelize.define(
+const Role = sequelize.define(
   'Role',
   {
     id: {
@@ -12,10 +14,14 @@ export const Role = sequelize.define(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
     },
   },
   {
     underscored: true,
   },
 );
+
+Role.belongsToMany(Scope, { through: RoleScopes });
+
+export default Role;

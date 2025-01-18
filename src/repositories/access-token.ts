@@ -1,7 +1,7 @@
 import { ResultSetHeader } from 'mysql2';
 import { executeQuery } from '../db-connection';
 import { User } from '../models/user';
-import { AccessToken } from '../models/access-token';
+import { AccessToken } from '../models/session';
 
 export const createAccessToken = async (
   accessToken: string,

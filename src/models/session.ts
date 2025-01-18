@@ -1,30 +1,27 @@
+export interface AccessToken {
+  id: number;
+  access_token: string;
+  expires_at: Date;
+  user_id: number;
+}
+
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/database';
 
-export enum ScopeType {
-  get,
-  list,
-  create,
-  update,
-  delete,
-}
-
-export const Scope = sequelize.define(
-  'Scope',
+export const Session = sequelize.define(
+  'Session',
   {
     id: {
       type: DataTypes.UUIDV4,
       primaryKey: true,
       allowNull: false,
     },
-    name: {
+    accessToken: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
-    type: {
-      type: DataTypes.ENUM,
-      values: Object.keys(ScopeType),
+    password: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
