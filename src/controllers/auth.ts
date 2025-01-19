@@ -4,10 +4,11 @@ import { getUserByEmail } from '../repositories/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {
-  createAccessToken,
-  deleteAccessToken,
-  getAccessTokenByAccessToken,
-} from '../repositories/access-token';
+  createUserToken,
+  getUserTokenByAccessToken,
+  revokeUserToken,
+} from '../repositories/user-token';
+import { Prisma } from '@prisma/client';
 
 export const authRouter = express.Router();
 
@@ -37,7 +38,7 @@ const login = async (req: Request, res: Response) => {
 
   const isPasswordValid = await bcrypt.compare(
     loginRequest.password,
-    user.password_hash,
+    user.passwordHash,
   );
 
   if (!isPasswordValid) {
@@ -49,8 +50,14 @@ const login = async (req: Request, res: Response) => {
   const accessToken = jwt.sign({ email: user.email, id: user.id }, JWT_SECRET, {
     expiresIn: '5m',
   });
+  const decodedToken = jwt.decode(accessToken) as jwt.JwtPayload;
+  const userToken: Prisma.UserTokenCreateInput = {
+    accessToken: accessToken,
+    accessTokenExpiresAt: decodedToken.exp || 0,
+    user: { connect: user },
+  };
 
-  await createAccessToken(accessToken, user);
+  await createUserToken(userToken);
 
   const response: LoginResponse = {
     accessToken: accessToken,
@@ -77,17 +84,15 @@ const logout = async (req: Request, res: Response) => {
     return;
   }
 
-  const accessToken = await getAccessTokenByAccessToken(
-    logoutRequest.accessToken,
-  );
+  const userToken = await getUserTokenByAccessToken(logoutRequest.accessToken);
 
-  if (!accessToken) {
+  if (!userToken || userToken.isRevoked) {
     res.status(404);
     res.send({ error: 'Access token not found!' });
     return;
   }
 
-  await deleteAccessToken(accessToken);
+  await revokeUserToken(userToken);
 
   res.status(200);
   res.send({ success: 'Logout successfully' });

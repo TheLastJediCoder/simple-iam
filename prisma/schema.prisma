@@ -38,14 +38,14 @@ model Scope {
 }
 
 model UserToken {
-  id                    String    @id @default(uuid())
-  accessToken           String    @map("access_token") @db.VarChar(500)
-  accessTokenExpiresAt  DateTime  @map("access_token_expires_at") @db.DateTime(0)
-  userId                String    @default(uuid()) @map("user_id")
-  refreshToken          String    @map("refresh_token") @db.VarChar(500)
-  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at") @db.DateTime(0)
-  isRevoked             Boolean?  @map("is_revoked")
-  users                 User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "access_tokens_user_id_fk")
+  id                    String  @id @default(uuid())
+  accessToken           String  @map("access_token") @db.VarChar(500)
+  accessTokenExpiresAt  Int     @map("access_token_expires_at") @db.Int
+  userId                String  @default(uuid()) @map("user_id")
+  refreshToken          String? @map("refresh_token") @db.VarChar(500)
+  refreshTokenExpiresAt Int?    @map("refresh_token_expires_at") @db.Int
+  isRevoked             Boolean @default(false) @map("is_revoked")
+  user                  User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "access_tokens_user_id_fk")
 
   @@index([userId], map: "access_tokens_user_id_fk")
   @@map("user_tokens")
