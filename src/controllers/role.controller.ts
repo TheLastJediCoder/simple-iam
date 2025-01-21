@@ -1,9 +1,9 @@
 import { Prisma, Scope } from '@prisma/client';
 import express, { Request, Response } from 'express';
-import { CreateRoleRequest, CreateRoleResponse } from '../dtos/role';
-import { roleRepository } from '../repositories/role';
-import { scopeRepository } from '../repositories/scope';
-import { roleScopeRepository } from '../repositories/role-scope';
+import { CreateRoleRequest, CreateRoleResponse } from '../dtos/role.dto';
+import { roleRepository } from '../repositories/role.repository';
+import { scopeRepository } from '../repositories/scope.repository';
+import { roleScopeRepository } from '../repositories/role-scope.repository';
 
 export const roleRouter = express.Router();
 

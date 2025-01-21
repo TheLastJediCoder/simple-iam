@@ -1,13 +1,13 @@
 import express, { Request, Response } from 'express';
-import { LoginRequest, LoginResponse, LogoutRequest } from '../dtos/auth';
-import { getUserByEmail } from '../repositories/user';
+import { LoginRequest, LoginResponse, LogoutRequest } from '../dtos/auth.dto';
+import { getUserByEmail } from '../repositories/user.repository';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {
   createUserToken,
   getUserTokenByAccessToken,
   revokeUserToken,
-} from '../repositories/user-token';
+} from '../repositories/user-token.repository';
 import { Prisma } from '@prisma/client';
 
 export const authRouter = express.Router();

@@ -1,10 +1,10 @@
 import bodyParser from 'body-parser';
 import express from 'express';
 import 'dotenv/config';
-import { userRouter } from './controllers/user';
-import { authRouter } from './controllers/auth';
-import { scopeRouter } from './controllers/scope';
-import { roleRouter } from './controllers/role';
+import { userRouter } from './controllers/user.controller';
+import { authRouter } from './controllers/auth.controller';
+import { scopeRouter } from './controllers/scope.controller';
+import { roleRouter } from './controllers/role.controller';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -30,6 +30,5 @@ process.on('SIGINT', async () => {
 });
 
 app.listen(PORT, async () => {
-  // await checkDatabaseConnection();
   console.log(`Simple IAM running on port ${PORT}`);
 });

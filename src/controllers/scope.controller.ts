@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
-import { CreateScopeRequest, CreateScopeResponse } from '../dtos/scope';
+import { CreateScopeRequest, CreateScopeResponse } from '../dtos/scope.dto';
 import { ScopesType } from '@prisma/client';
-import { scopeRepository } from '../repositories/scope';
+import { scopeRepository } from '../repositories/scope.repository';
 
 export const scopeRouter = express.Router();
 

@@ -1,10 +1,10 @@
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { createUser, getUserByEmail } from '../repositories/user';
-import { CreateUserRequest, CreateUserResponse } from '../dtos/user';
+import { createUser, getUserByEmail } from '../repositories/user.repository';
+import { CreateUserRequest, CreateUserResponse } from '../dtos/user.dto';
 import { Prisma, Role } from '@prisma/client';
-import { roleRepository } from '../repositories/role';
-import { userRoleRepository } from '../repositories/user-role';
+import { roleRepository } from '../repositories/role.repository';
+import { userRoleRepository } from '../repositories/user-role.repository';
 
 export const userRouter = express.Router();
 
