@@ -42,8 +42,8 @@ model UserToken {
   accessToken           String  @map("access_token") @db.VarChar(500)
   accessTokenExpiresAt  Int     @map("access_token_expires_at") @db.Int
   userId                String  @default(uuid()) @map("user_id")
-  refreshToken          String? @map("refresh_token") @db.VarChar(500)
-  refreshTokenExpiresAt Int?    @map("refresh_token_expires_at") @db.Int
+  refreshToken          String  @map("refresh_token") @db.VarChar(500)
+  refreshTokenExpiresAt Int     @map("refresh_token_expires_at") @db.Int
   isRevoked             Boolean @default(false) @map("is_revoked")
   user                  User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "access_tokens_user_id_fk")
 

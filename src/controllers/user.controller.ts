@@ -1,17 +1,17 @@
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { createUser, getUserByEmail } from '../repositories/user.repository';
 import { CreateUserRequest, CreateUserResponse } from '../dtos/user.dto';
 import { Prisma, Role } from '@prisma/client';
 import { roleRepository } from '../repositories/role.repository';
 import { userRoleRepository } from '../repositories/user-role.repository';
+import { userRepository } from '../repositories/user.repository';
 
 export const userRouter = express.Router();
 
 const addUser = async (req: Request, res: Response) => {
   const createUserRequest = req.body as CreateUserRequest;
   const salt = await bcrypt.genSalt(12);
-  const existingUser = await getUserByEmail(createUserRequest.email);
+  const existingUser = await userRepository.getUserByEmail(createUserRequest.email);
 
   if (existingUser) {
     res.status(400).json('Please pick different email');
@@ -23,7 +23,7 @@ const addUser = async (req: Request, res: Response) => {
     email: createUserRequest.email,
     passwordHash: hashedPassword,
   };
-  const newUser = await createUser(user);
+  const newUser = await userRepository.createUser(user);
   const roles: Role[] = [];
 
   if (createUserRequest.roles) {

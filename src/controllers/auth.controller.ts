@@ -1,13 +1,9 @@
 import express, { Request, Response } from 'express';
-import { LoginRequest, LoginResponse, LogoutRequest } from '../dtos/auth.dto';
-import { getUserByEmail } from '../repositories/user.repository';
+import { LoginRequest, LoginResponse, LogoutRequest, RefreshTokenRequest, RefreshTokenResponse } from '../dtos/auth.dto';
+import { userRepository } from '../repositories/user.repository';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import {
-  createUserToken,
-  getUserTokenByAccessToken,
-  revokeUserToken,
-} from '../repositories/user-token.repository';
+import { userTokenRepository } from '../repositories/user-token.repository';
 import { Prisma } from '@prisma/client';
 
 export const authRouter = express.Router();
@@ -28,7 +24,7 @@ const login = async (req: Request, res: Response) => {
   }
 
   const loginRequest = req.body as LoginRequest;
-  const user = await getUserByEmail(loginRequest.email);
+  const user = await userRepository.getUserByEmail(loginRequest.email);
 
   if (!user) {
     res.status(401);
@@ -51,16 +47,23 @@ const login = async (req: Request, res: Response) => {
     expiresIn: '5m',
   });
   const decodedToken = jwt.decode(accessToken) as jwt.JwtPayload;
+  const refreshToken = jwt.sign({ email: user.email, id: user.id }, JWT_SECRET, {
+    expiresIn: '12h',
+  });
+  const decodedRefreshToken = jwt.decode(refreshToken) as jwt.JwtPayload;
   const userToken: Prisma.UserTokenCreateInput = {
     accessToken: accessToken,
     accessTokenExpiresAt: decodedToken.exp || 0,
     user: { connect: user },
+    refreshToken: refreshToken,
+    refreshTokenExpiresAt: decodedRefreshToken.exp || 0,
   };
 
-  await createUserToken(userToken);
+  await userTokenRepository.createUserToken(userToken);
 
   const response: LoginResponse = {
     accessToken: accessToken,
+    refreshToken: refreshToken,
   };
 
   res.status(200);
@@ -84,7 +87,7 @@ const logout = async (req: Request, res: Response) => {
     return;
   }
 
-  const userToken = await getUserTokenByAccessToken(logoutRequest.accessToken);
+  const userToken = await userTokenRepository.getUserTokenByAccessToken(logoutRequest.accessToken);
 
   if (!userToken || userToken.isRevoked) {
     res.status(404);
@@ -92,11 +95,48 @@ const logout = async (req: Request, res: Response) => {
     return;
   }
 
-  await revokeUserToken(userToken);
+  await userTokenRepository.revokeUserToken(userToken);
 
   res.status(200);
   res.send({ success: 'Logout successfully' });
 };
 
+const refreshToken = async (req: Request, res: Response) => {
+  if (!req.body.refreshToken) {
+    res.status(400);
+    res.send({error: 'Refresh token is missing in request!'});
+    return;
+  }
+
+  const refreshTokenRequest: RefreshTokenRequest = req.body;
+  const userToken = await userTokenRepository.getUserTokenByRefreshToken(refreshTokenRequest.refreshToken)
+
+  if (!userToken) {
+    res.status(404);
+    res.send({error: 'Refresh token not fount!'});
+    return;
+  }
+
+  const user = await userRepository.getUserById(userToken.userId);
+  const accessToken = jwt.sign({ email: user?.email, id: user?.id }, JWT_SECRET, {
+    expiresIn: '5m',
+  });
+  const decodedToken = jwt.decode(accessToken) as jwt.JwtPayload;
+
+  userToken.accessToken = accessToken;
+  userToken.accessTokenExpiresAt = decodedToken.exp || 0;
+
+  const updatedUserToken = await userTokenRepository.updateUserToken(userToken);
+
+  const response: RefreshTokenResponse = {
+    accessToken: updatedUserToken.accessToken,
+    refreshToken: updatedUserToken.refreshToken,
+  }
+
+  res.status(200);
+  res.send(response);
+}
+
 authRouter.post('/login', login);
 authRouter.post('/logout', logout);
+authRouter.post('/refresh-token', refreshToken);
