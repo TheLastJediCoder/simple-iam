@@ -1,5 +1,12 @@
 import express, { Request, Response } from 'express';
-import { LoginRequest, LoginResponse, LogoutRequest, RefreshTokenRequest, RefreshTokenResponse } from '../dtos/auth.dto';
+import {
+  AuthorizeRequest,
+  LoginRequest,
+  LoginResponse,
+  LogoutRequest,
+  RefreshTokenRequest,
+  RefreshTokenResponse,
+} from '../dtos/auth.dto';
 import { userRepository } from '../repositories/user.repository';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -47,9 +54,13 @@ const login = async (req: Request, res: Response) => {
     expiresIn: '5m',
   });
   const decodedToken = jwt.decode(accessToken) as jwt.JwtPayload;
-  const refreshToken = jwt.sign({ email: user.email, id: user.id }, JWT_SECRET, {
-    expiresIn: '12h',
-  });
+  const refreshToken = jwt.sign(
+    { email: user.email, id: user.id },
+    JWT_SECRET,
+    {
+      expiresIn: '12h',
+    },
+  );
   const decodedRefreshToken = jwt.decode(refreshToken) as jwt.JwtPayload;
   const userToken: Prisma.UserTokenCreateInput = {
     accessToken: accessToken,
@@ -87,7 +98,9 @@ const logout = async (req: Request, res: Response) => {
     return;
   }
 
-  const userToken = await userTokenRepository.getUserTokenByAccessToken(logoutRequest.accessToken);
+  const userToken = await userTokenRepository.getUserTokenByAccessToken(
+    logoutRequest.accessToken,
+  );
 
   if (!userToken || userToken.isRevoked) {
     res.status(404);
@@ -104,23 +117,29 @@ const logout = async (req: Request, res: Response) => {
 const refreshToken = async (req: Request, res: Response) => {
   if (!req.body.refreshToken) {
     res.status(400);
-    res.send({error: 'Refresh token is missing in request!'});
+    res.send({ error: 'Refresh token is missing in request!' });
     return;
   }
 
   const refreshTokenRequest: RefreshTokenRequest = req.body;
-  const userToken = await userTokenRepository.getUserTokenByRefreshToken(refreshTokenRequest.refreshToken)
+  const userToken = await userTokenRepository.getUserTokenByRefreshToken(
+    refreshTokenRequest.refreshToken,
+  );
 
   if (!userToken) {
     res.status(404);
-    res.send({error: 'Refresh token not fount!'});
+    res.send({ error: 'Refresh token not fount!' });
     return;
   }
 
   const user = await userRepository.getUserById(userToken.userId);
-  const accessToken = jwt.sign({ email: user?.email, id: user?.id }, JWT_SECRET, {
-    expiresIn: '5m',
-  });
+  const accessToken = jwt.sign(
+    { email: user?.email, id: user?.id },
+    JWT_SECRET,
+    {
+      expiresIn: '5m',
+    },
+  );
   const decodedToken = jwt.decode(accessToken) as jwt.JwtPayload;
 
   userToken.accessToken = accessToken;
@@ -131,12 +150,33 @@ const refreshToken = async (req: Request, res: Response) => {
   const response: RefreshTokenResponse = {
     accessToken: updatedUserToken.accessToken,
     refreshToken: updatedUserToken.refreshToken,
-  }
+  };
 
   res.status(200);
   res.send(response);
-}
+};
+
+const authorize = async (req: Request, res: Response) => {
+  if (!req.body.accessToken) {
+    res.status(400);
+    res.send({ error: 'Access token missing' });
+  }
+
+  const authorizeRequest: AuthorizeRequest = req.body;
+  const userToken = await userTokenRepository.getUserTokenByAccessToken(
+    authorizeRequest.accessToken,
+  );
+
+  if (!userToken) {
+    res.status(401);
+    res.send({ error: 'Invlaid access token' });
+  }
+
+  res.status(200);
+  res.send({ message: 'Successfully authorize' });
+};
 
 authRouter.post('/login', login);
 authRouter.post('/logout', logout);
 authRouter.post('/refresh-token', refreshToken);
+authRouter.post('/authorize', authorize);

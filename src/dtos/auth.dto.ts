@@ -20,3 +20,7 @@ export interface RefreshTokenResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface AuthorizeRequest {
+  accessToken: string;
+}
