@@ -4,17 +4,13 @@ import { CreateRoleRequest, CreateRoleResponse } from '../dtos/role.dto';
 import { roleRepository } from '../repositories/role.repository';
 import { scopeRepository } from '../repositories/scope.repository';
 import { roleScopeRepository } from '../repositories/role-scope.repository';
+import { validate } from './middlewares/validation.middleware';
 
 export const roleRouter = express.Router();
 
 const createRole = async (req: Request, res: Response) => {
-  if (!req.body.name) {
-    res.status(401);
-    res.send({ error: 'Invalid request body' });
-    return;
-  }
-
   const request: CreateRoleRequest = req.body;
+
   const role: Prisma.RoleCreateInput = {
     name: request.name,
   };
@@ -47,4 +43,4 @@ const createRole = async (req: Request, res: Response) => {
   res.send(response);
 };
 
-roleRouter.post('/', createRole);
+roleRouter.post('/', validate(CreateRoleRequest), createRole);

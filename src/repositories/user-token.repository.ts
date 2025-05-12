@@ -33,11 +33,15 @@ const getUserTokenByRefreshToken = async (
 
 const updateUserToken = async (userToken: UserToken) => {
   return await prisma.userToken.update({
-    where: {id: userToken.id},
+    where: { id: userToken.id },
     data: userToken,
-  })
-}
+  });
+};
 
 export const userTokenRepository = {
-  createUserToken, getUserTokenByAccessToken, revokeUserToken, getUserTokenByRefreshToken, updateUserToken
-}
+  createUserToken,
+  getUserTokenByAccessToken,
+  revokeUserToken,
+  getUserTokenByRefreshToken,
+  updateUserToken,
+};

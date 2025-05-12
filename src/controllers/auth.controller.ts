@@ -12,6 +12,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { userTokenRepository } from '../repositories/user-token.repository';
 import { Prisma } from '@prisma/client';
+import { validate } from '../middlewares/validation.middleware';
 
 export const authRouter = express.Router();
 
@@ -19,17 +20,6 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 const login = async (req: Request, res: Response) => {
   if (!req.body.email) {
-    res.status(404);
-    res.send({ error: 'Email is required for login' });
-    return;
-  }
-
-  if (!req.body.password) {
-    res.status(404);
-    res.send({ error: 'Password is required for login' });
-    return;
-  }
-
   const loginRequest = req.body as LoginRequest;
   const user = await userRepository.getUserByEmail(loginRequest.email);
 
@@ -82,12 +72,6 @@ const login = async (req: Request, res: Response) => {
 };
 
 const logout = async (req: Request, res: Response) => {
-  if (!req.body.accessToken) {
-    res.status(401);
-    res.send({ error: 'Access token is missing in request!' });
-    return;
-  }
-
   const logoutRequest: LogoutRequest = req.body;
 
   try {
@@ -115,12 +99,6 @@ const logout = async (req: Request, res: Response) => {
 };
 
 const refreshToken = async (req: Request, res: Response) => {
-  if (!req.body.refreshToken) {
-    res.status(400);
-    res.send({ error: 'Refresh token is missing in request!' });
-    return;
-  }
-
   const refreshTokenRequest: RefreshTokenRequest = req.body;
   const userToken = await userTokenRepository.getUserTokenByRefreshToken(
     refreshTokenRequest.refreshToken,
@@ -157,11 +135,6 @@ const refreshToken = async (req: Request, res: Response) => {
 };
 
 const authorize = async (req: Request, res: Response) => {
-  if (!req.body.accessToken) {
-    res.status(400);
-    res.send({ error: 'Access token missing' });
-  }
-
   const authorizeRequest: AuthorizeRequest = req.body;
   const userToken = await userTokenRepository.getUserTokenByAccessToken(
     authorizeRequest.accessToken,
@@ -176,7 +149,7 @@ const authorize = async (req: Request, res: Response) => {
   res.send({ message: 'Successfully authorize' });
 };
 
-authRouter.post('/login', login);
-authRouter.post('/logout', logout);
-authRouter.post('/refresh-token', refreshToken);
-authRouter.post('/authorize', authorize);
+authRouter.post('/login', validate(LoginRequest), login);
+authRouter.post('/logout', validate(LogoutRequest), logout);
+authRouter.post('/refresh-token', validate(RefreshTokenRequest), refreshToken);
+authRouter.post('/authorize', validate(AuthorizeRequest), authorize);
