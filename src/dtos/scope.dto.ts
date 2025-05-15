@@ -5,3 +5,13 @@ export interface CreateScopeRequest {
   type: ScopesType;
 }
 export type CreateScopeResponse = Scope;
+
+export type GetScopeByIdResponse = Scope | null;
+
+export interface UpdateScopeRequest {
+  id: string;
+  name?: string;
+  type?: ScopesType;
+}
+
+export type UpdateScopeResponse = Scope;

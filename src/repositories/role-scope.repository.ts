@@ -8,4 +8,13 @@ const linkRoleToScopes = async (role: Role, scopes: Scope[]) => {
   });
 };
 
-export const roleScopeRepository = { linkRoleToScopes };
+const unlinkRoleFromAllScopes = async (roleId: string) => {
+  return await prisma.roleScope.deleteMany({
+    where: { roleId },
+  });
+};
+
+export const roleScopeRepository = {
+  linkRoleToScopes,
+  unlinkRoleFromAllScopes,
+};

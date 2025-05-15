@@ -21,6 +21,16 @@ export interface RefreshTokenResponse {
   refreshToken: string;
 }
 
-export interface AuthorizeRequest {
-  accessToken: string;
+export interface RegisterRequest {
+  email: string;
+  password: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  password: string;
+  newPassword: string;
 }

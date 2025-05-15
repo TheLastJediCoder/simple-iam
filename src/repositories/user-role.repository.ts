@@ -8,4 +8,10 @@ const linkUserToRoles = async (user: User, roles: Role[]) => {
   });
 };
 
-export const userRoleRepository = { linkUserToRoles };
+const unlinkUserFromAllRoles = async (userId: string) => {
+  return await prisma.userRole.deleteMany({
+    where: { userId },
+  });
+};
+
+export const userRoleRepository = { linkUserToRoles, unlinkUserFromAllRoles };
